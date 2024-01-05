@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  datasource:
+    master:
+      hikari:
+        jdbc-url: jdbc:mysql://localhost:3306/test_database
+        username: root
+        password: master-password
+        driver-class-name: com.mysql.cj.jdbc.Driver
+
+    slave:
+      hikari:
+        jdbc-url: jdbc:mysql://localhost:3307/test_database
+        username: root
+        password: slave-password
+        driver-class-name: com.mysql.cj.jdbc.Driver

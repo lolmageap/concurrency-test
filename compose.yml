@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  master_db:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: master
+      MYSQL_ROOT_PASSWORD: master-password
+    ports:
+      - "3306:3306"
+
+  slave_db:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: slave
+      MYSQL_ROOT_PASSWORD: slave-password
+    ports:
+      - "3307:3306"
