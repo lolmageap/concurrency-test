@@ -1,8 +1,7 @@
 package com.example.concurrency
 
+import com.example.concurrency.Prefix.*
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.core.test.TestCase
-import io.kotest.core.test.isRootTest
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,50 +40,53 @@ internal class ConCurrencyTest(
     @Autowired private val conCurrencyRepository: ConCurrencyRepository,
 ) : BehaviorSpec({
 
-    afterContainer {
-        if (it.a.prefix == Prefix.GIVEN) {
+    // given 절 전에 clean up
+    beforeContainer {
+        if (it.prefix === GIVEN) {
             conCurrencyRepository.deleteAllInBatch()
         }
     }
 
-    Given("동시성 처리를 위해 ") {
+    // when 절 전에 clean up
+    beforeEach {
+        if (it.prefix === WHEN) {
+            conCurrencyRepository.deleteAllInBatch()
+        }
+    }
+
+    Given("동시성 처리를 위해 Lock 을 걸지 않은 뒤") {
         val entity = conCurrencyRepository.save(
             ConCurrencyEntity(
                 name = "No Lock",
             )
         )
 
-        When("5개의 Thread 로 1,000번의 Business Logic 을 비동기 로 실행 하고") {
-            Then("검증한다.").config(
-                threads = 5, invocations = 1000
-            ) {
-                concurrencyService.increaseCountNoLock(entity.id)
-            }
+        Then("5개의 Thread 로 1,000번의 Business Logic 을 비동기 로 실행 하고 검증 한다.").config(
+            threads = 5, invocations = 1000
+        ) {
+            concurrencyService.increaseCountNoLock(entity.id)
         }.let {
             conCurrencyRepository.findByIdOrNull(entity.id)?.let {
                 it.likeCount shouldBeLessThan 800
             }
-            conCurrencyRepository.deleteAllInBatch()
         }
     }
 
-    Given("동시성 처리를 위해") {
+    Given("동시성 처리를 위해 Pessimistic Lock 적용한 뒤") {
         val entity = conCurrencyRepository.save(
             ConCurrencyEntity(
                 name = "Pessimistic Lock",
             )
         )
 
-        When("Pessimistic Lock 적용한 뒤 5개의 Thread 로 1,000번의 Business Logic 을 비동기 로 실행 하고") {
-            Then("검증한다.").config(
-                threads = 5, invocations = 1000
-            ) {
-                concurrencyService.increaseCountWithPessimisticLock(entity.id)
-            }
+        Then("5개의 Thread 로 1,000번의 Business Logic 을 비동기 로 실행 하고 검증 한다.").config(
+            threads = 5, invocations = 1000
+        ) {
+            concurrencyService.increaseCountWithPessimisticLock(entity.id)
         }.let {
-            conCurrencyRepository.findByIdOrNull(2)?.let {
-                    it.likeCount shouldBe 1000
-                }
+            conCurrencyRepository.findByIdOrNull(entity.id)?.let {
+                it.likeCount shouldBe 1000
+            }
         }
     }
 
