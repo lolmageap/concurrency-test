@@ -38,7 +38,7 @@ internal class OptimisticTest(
     }.let {
         optimisticRepository.findByIdOrNull(1)
             ?.let {
-                it.likeCount shouldBe 1000
+                it.count shouldBe 1000
             }
     }
 

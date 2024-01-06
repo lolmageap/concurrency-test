@@ -24,7 +24,7 @@ class OptimisticService(
     fun increaseCountWithOptimisticLock(id: Long) {
         val entity = optimisticRepository.findWithOptimisticLockById(id)
         entity?.let {
-            it.likeCount += 1
+            it.count += 1
         }
     }
 

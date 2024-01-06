@@ -13,14 +13,14 @@ class ConCurrencyService(
     fun increaseCountNoLock(id: Long) {
         conCurrencyRepository.findByIdOrNull(id)
             ?.let {
-                it.likeCount += 1
+                it.count += 1
             }
     }
 
     fun increaseCountWithPessimisticLock(id: Long) {
         conCurrencyRepository.findWithPessimisticLockById(id)
             ?.let {
-                it.likeCount += 1
+                it.count += 1
             }
     }
 

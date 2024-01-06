@@ -67,7 +67,7 @@ internal class ConCurrencyTest(
             concurrencyService.increaseCountNoLock(entity.id)
         }.let {
             conCurrencyRepository.findByIdOrNull(entity.id)?.let {
-                it.likeCount shouldBeLessThan 800
+                it.count shouldBeLessThan 800
             }
         }
     }
@@ -85,7 +85,7 @@ internal class ConCurrencyTest(
             concurrencyService.increaseCountWithPessimisticLock(entity.id)
         }.let {
             conCurrencyRepository.findByIdOrNull(entity.id)?.let {
-                it.likeCount shouldBe 1000
+                it.count shouldBe 1000
             }
         }
     }
