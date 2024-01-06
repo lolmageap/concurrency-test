@@ -35,12 +35,11 @@ internal class OptimisticTest(
         invocations = 1000
     ) {
         optimisticService.increaseCountWithOptimisticLock(1)
-    }
-
-    afterTest {
+    }.let {
         optimisticRepository.findByIdOrNull(1)
             ?.let {
                 it.likeCount shouldBe 1000
             }
     }
+
 })
