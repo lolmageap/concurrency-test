@@ -1,6 +1,8 @@
 package com.example.concurrency
 
-import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.core.test.TestCase
+import io.kotest.core.test.isRootTest
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,64 +25,67 @@ import org.springframework.data.repository.findByIdOrNull
  * PostgreSQL에서는 행 레벨 락킹을 주로 사용 하며, 이는 각 트랜잭션이 데이터 의 버전에 대해 작업을 수행함 으로써 여러 트랜잭션 사이의 충돌을 방지 합니다.
  * 한 트랜잭션에서 변경 되는 데이터 는 다른 트랜잭션에 영향을 주지 않습니다.
  *
- * PostgreSQL 에서 락은 다음과 같이 여러 가지 유형이 있습니다:
- *
- * 행 공유 락 (ROW SHARE)
- * 행 독점 락 (ROW EXCLUSIVE)
- * 공유 락 (SHARE)
- * 공유 독점 락 (SHARE ROW EXCLUSIVE)
- * 독점 락 (EXCLUSIVE)
- * 접근 독점 락 (ACCESS EXCLUSIVE)
+ * PostgreSQL 에서 락은 다음과 같이 여러 가지 유형이 있습니다.
+ * ROW SHARE
+ * ROW EXCLUSIVE
+ * SHARE
+ * SHARE ROW EXCLUSIVE
+ * EXCLUSIVE
+ * ACCESS EXCLUSIVE
  */
+
 
 @SpringBootTest
 internal class ConCurrencyTest(
     @Autowired private val concurrencyService: ConCurrencyService,
     @Autowired private val conCurrencyRepository: ConCurrencyRepository,
-) : StringSpec({
+) : BehaviorSpec({
 
-    beforeTest {
-        conCurrencyRepository.deleteAllInBatch()
+    afterContainer {
+        if (it.a.prefix == Prefix.GIVEN) {
+            conCurrencyRepository.deleteAllInBatch()
+        }
+    }
 
-        conCurrencyRepository.saveAll(
-            listOf(
-                ConCurrencyEntity(
-                    id = 1,
-                    name = "No Lock",
-                ),
-                ConCurrencyEntity(
-                    id = 2,
-                    name = "Pessimistic Lock",
-                ),
+    Given("동시성 처리를 위해 ") {
+        val entity = conCurrencyRepository.save(
+            ConCurrencyEntity(
+                name = "No Lock",
             )
-
         )
-    }
 
-    """5개의 Thread 로 1,000번의 Business Logic 을 비동기 로 실행 하여 동시성 이슈를 테스트 한다.""".config(
-        threads = 5,
-        invocations = 1000
-    ) {
-        concurrencyService.increaseCountNoLock(1)
-    }
-
-    """5개의 Thread 로 1,000번의 Business Logic 을 비동기 로 실행 하여 Pessimistic Lock 으로 동시성 을 제어 한다.""".config(
-        threads = 5,
-        invocations = 1000
-    ) {
-        concurrencyService.increaseCountWithPessimisticLock(2)
-    }
-
-    afterTest {
-        conCurrencyRepository.findByIdOrNull(1)
-            ?.let {
+        When("5개의 Thread 로 1,000번의 Business Logic 을 비동기 로 실행 하고") {
+            Then("검증한다.").config(
+                threads = 5, invocations = 1000
+            ) {
+                concurrencyService.increaseCountNoLock(entity.id)
+            }
+        }.let {
+            conCurrencyRepository.findByIdOrNull(entity.id)?.let {
                 it.likeCount shouldBeLessThan 800
             }
+            conCurrencyRepository.deleteAllInBatch()
+        }
+    }
 
-        conCurrencyRepository.findByIdOrNull(2)
-            ?.let {
-                it.likeCount shouldBe 1000
+    Given("동시성 처리를 위해") {
+        val entity = conCurrencyRepository.save(
+            ConCurrencyEntity(
+                name = "Pessimistic Lock",
+            )
+        )
+
+        When("Pessimistic Lock 적용한 뒤 5개의 Thread 로 1,000번의 Business Logic 을 비동기 로 실행 하고") {
+            Then("검증한다.").config(
+                threads = 5, invocations = 1000
+            ) {
+                concurrencyService.increaseCountWithPessimisticLock(entity.id)
             }
+        }.let {
+            conCurrencyRepository.findByIdOrNull(2)?.let {
+                    it.likeCount shouldBe 1000
+                }
+        }
     }
 
 })
