@@ -2,8 +2,10 @@ package com.example.concurrency
 
 import com.example.concurrency.DatabaseProperty.MASTER
 import com.example.concurrency.DatabaseProperty.MASTER_DATASOURCE
+import com.example.concurrency.DatabaseProperty.MASTER_PATH
 import com.example.concurrency.DatabaseProperty.SLAVE
 import com.example.concurrency.DatabaseProperty.SLAVE_DATASOURCE
+import com.example.concurrency.DatabaseProperty.SLAVE_PATH
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -21,14 +23,14 @@ import javax.sql.DataSource
 class TransactionConfig {
 
     @Bean(name = [MASTER_DATASOURCE])
-    @ConfigurationProperties(prefix = "spring.datasource.master.hikari")
+    @ConfigurationProperties(MASTER_PATH)
     fun masterDataSource(): HikariDataSource =
         DataSourceBuilder.create()
             .type(HikariDataSource::class.java)
             .build()
 
     @Bean(name = [SLAVE_DATASOURCE])
-    @ConfigurationProperties("spring.datasource.slave.hikari")
+    @ConfigurationProperties(SLAVE_PATH)
     fun slaveDataSource(): HikariDataSource =
         DataSourceBuilder.create()
             .type(HikariDataSource::class.java)
@@ -45,7 +47,6 @@ class TransactionConfig {
             this[MASTER] = masterDataSource
             this[SLAVE] = slaveDataSource
         }
-
         return RoutingDataSource().apply {
             setTargetDataSources(dataSources)
             setDefaultTargetDataSource(masterDataSource)
