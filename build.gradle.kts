@@ -23,6 +23,9 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.redisson:redisson-spring-data-27:3.25.2")
+
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.github.oshai:kotlin-logging:5.1.0")
     implementation("org.springframework.retry:spring-retry")
