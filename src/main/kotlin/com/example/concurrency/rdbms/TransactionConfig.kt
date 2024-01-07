@@ -1,11 +1,11 @@
-package com.example.concurrency
+package com.example.concurrency.rdbms
 
-import com.example.concurrency.DatabaseProperty.MASTER
-import com.example.concurrency.DatabaseProperty.MASTER_DATASOURCE
-import com.example.concurrency.DatabaseProperty.MASTER_PATH
-import com.example.concurrency.DatabaseProperty.SLAVE
-import com.example.concurrency.DatabaseProperty.SLAVE_DATASOURCE
-import com.example.concurrency.DatabaseProperty.SLAVE_PATH
+import com.example.concurrency.rdbms.DatabaseProperty.MASTER
+import com.example.concurrency.rdbms.DatabaseProperty.MASTER_DATASOURCE
+import com.example.concurrency.rdbms.DatabaseProperty.MASTER_PATH
+import com.example.concurrency.rdbms.DatabaseProperty.SLAVE
+import com.example.concurrency.rdbms.DatabaseProperty.SLAVE_DATASOURCE
+import com.example.concurrency.rdbms.DatabaseProperty.SLAVE_PATH
 import com.zaxxer.hikari.HikariDataSource
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.ConfigurationProperties

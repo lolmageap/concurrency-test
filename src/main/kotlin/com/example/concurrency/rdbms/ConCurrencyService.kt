@@ -1,4 +1,4 @@
-package com.example.concurrency
+package com.example.concurrency.rdbms
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service

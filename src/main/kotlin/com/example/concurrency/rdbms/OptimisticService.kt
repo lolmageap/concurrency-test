@@ -1,4 +1,4 @@
-package com.example.concurrency
+package com.example.concurrency.rdbms
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.hibernate.StaleStateException

@@ -1,4 +1,4 @@
-package com.example.concurrency
+package com.example.concurrency.rdbms
 
 object DatabaseProperty {
     const val MASTER_DATASOURCE = "masterDataSource"
