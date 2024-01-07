@@ -1,6 +1,8 @@
 package com.example.concurrency
 
 import com.example.concurrency.Prefix.*
+import com.example.concurrency.rdbms.ConCurrencyRepository
+import com.example.concurrency.rdbms.ConCurrencyService
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
