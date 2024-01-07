@@ -6,10 +6,11 @@
 
 코루틴 스코프 내에서 여러개의 thread로 동시성 및 성능을 테스트합니다.
 
-1. Lock을 걸지 않고 test
-2. Pessimistic Lock을 걸고 test
-3. Optimistic Lock을 걸고 test
-4. Redis RedLock test (미구현)
+1. No Lock test
+2. Pessimistic Lock test
+3. Optimistic Lock test
+4. Redis Spin Lock test
+5. Redis RedLock test
 ---
 
 ### Database 이중화
