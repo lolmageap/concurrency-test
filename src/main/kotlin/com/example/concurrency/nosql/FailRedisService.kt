@@ -53,7 +53,10 @@ class FailRedisService(
          * 이 부분에서 unlock은 되었지만 transacion 이 끝나지 않았기 때문에 다른 thread가 lock을 획득할 수 있습니다.
          * 때문에 동시성 이슈가 발생하게 됩니다.
          * 그래서 traction이 끝나기 전에 savsAndFlush를 해주어야 합니다.
-         * 하지만 @Transaction 이 커넥션을 끊는 동작에서 동시성 이슈가 발생합니다..
+         * 하지만 savsAndFlush를 해도 바로 commit이 되는것이 아니라
+         * @Transaction 이 커넥션을 끊는 동작에서 commit이 발생하기 때문에 동시성 이슈가 발생합니다..
+         * 동작 과정 Flow : lock -> find -> saveAndFlush(commit x) -> unlock -> transaction end(commit o)
+         * unlock은 되었지만 commit이 되지 않은 시점에서 다른 thread가 조회를 시도해서 동시성 이슈가 발생합니다.
          */
     }
 
