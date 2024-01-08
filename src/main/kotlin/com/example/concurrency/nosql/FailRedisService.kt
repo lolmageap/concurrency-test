@@ -55,7 +55,7 @@ class FailRedisService(
          * @Transaction 이 커넥션 을 끊는 동작 에서 commit 이 발생 하기 때문에 동시성 이슈가 발생 합니다..
          * 동작 과정 Flow : lock -> find -> saveAndFlush(commit x) -> unlock -> transaction end(commit o)
          * unlock 은 되었 지만 commit 이 되지 않은 시점 에서 다른 thread 가 조회를 시도 해서 동시성 이슈가 발생 합니다.
-         * redis transaction 으로 묶게 되면 이와 같은 이슈가 발생 하여 실패 하게 됩니다.
+         * redis 의 lock, unlock 을 transaction 으로 묶게 되면 이와 같은 이슈가 발생 하여 실패 하게 됩니다.
          */
     }
 
