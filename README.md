@@ -75,3 +75,6 @@ exit
 ```
 exit
 ```
+
+## TODO
+- 멀티 모듈로 나눠서 R2DBC도 transaction으로 라우팅 제어하기

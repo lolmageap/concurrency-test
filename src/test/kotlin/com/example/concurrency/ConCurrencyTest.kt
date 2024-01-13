@@ -42,14 +42,14 @@ internal class ConCurrencyTest(
     @Autowired private val conCurrencyRepository: ConCurrencyRepository,
 ) : BehaviorSpec({
 
-    // given 절 전에 clean up
+    // given 절 clean up
     beforeContainer {
         if (it.prefix === GIVEN) {
             conCurrencyRepository.deleteAllInBatch()
         }
     }
 
-    // when 절 전에 clean up
+    // when 절 clean up
     beforeEach {
         if (it.prefix === WHEN) {
             conCurrencyRepository.deleteAllInBatch()

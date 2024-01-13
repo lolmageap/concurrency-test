@@ -3,13 +3,11 @@ package com.example.concurrency.nosql
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.util.concurrent.TimeUnit.SECONDS
 
 
 @Component
-@Transactional
 class FailRedisService(
     private val redisTemplate: StringRedisTemplate,
     private val redissonClient: RedissonClient,
@@ -49,12 +47,15 @@ class FailRedisService(
         } finally {
             lock.unlock()
         }
-
         /**
-         * 이 부분에서 unlock은 되었지만 transacion 이 끝나지 않았기 때문에 다른 thread가 lock을 획득할 수 있습니다.
-         * 때문에 동시성 이슈가 발생하게 됩니다.
-         * 그래서 traction이 끝나기 전에 savsAndFlush를 해주어야 합니다.
-         * 하지만 그래도 동시성 이슈가 발생합니다..
+         * 이 부분 에서 unlock 은 되었지만 transaction 이 끝나지 않았기 때문에 다른 thread 가 lock 을 획득할 수 있습니다.
+         * 때문에 동시성 이슈가 발생 하게 됩니다.
+         * 그래서 transaction 이 끝나기 전에 saveAndFlush 를 해줘야 합니다.
+         * 하지만 saveAndFlush 를 해도 바로 commit 이 되는 것이 아니라
+         * @Transaction 이 커넥션 을 끊는 동작 에서 commit 이 발생 하기 때문에 동시성 이슈가 발생 합니다..
+         * 동작 과정 Flow : lock -> find -> saveAndFlush(commit x) -> unlock -> transaction end(commit o)
+         * unlock 은 되었 지만 commit 이 되지 않은 시점 에서 다른 thread 가 조회를 시도 해서 동시성 이슈가 발생 합니다.
+         * redis 의 lock, unlock 을 transaction 으로 묶게 되면 이와 같은 이슈가 발생 하여 실패 하게 됩니다.
          */
     }
 

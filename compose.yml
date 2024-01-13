@@ -41,3 +41,10 @@ services:
       - master_db
     ports:
       - "3307:3306"
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
