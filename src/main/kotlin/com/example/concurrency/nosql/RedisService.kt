@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 
 @Component
-class SuccessRedisService(
+class RedisService(
     private val redisTemplate: StringRedisTemplate,
     private val redissonClient: RedissonClient,
     private val conCurrencyWithRedisService: ConCurrencyWithRedisService,

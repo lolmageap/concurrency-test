@@ -1,6 +1,6 @@
 package com.example.concurrency
 
-import com.example.concurrency.nosql.SuccessRedisService
+import com.example.concurrency.nosql.RedisService
 import com.example.concurrency.rdbms.ConCurrencyRepository
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.testcontainers.perSpec
@@ -11,9 +11,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.testcontainers.containers.GenericContainer
 
 @SpringBootTest
-internal class SuccessRedisLockTest(
+internal class RedisLockTest(
     @Autowired private val conCurrencyRepository: ConCurrencyRepository,
-    @Autowired private val successRedisService: SuccessRedisService,
+    @Autowired private val redisService: RedisService,
 ) : BehaviorSpec({
 
     val redisContainer = GenericContainer<Nothing>("redis:5.0.3-alpine")
@@ -40,7 +40,7 @@ internal class SuccessRedisLockTest(
             invocations = 1000,
             enabled = true,
         ) {
-            successRedisService.increaseCountWithSpinLock(entity.id)
+            redisService.increaseCountWithSpinLock(entity.id)
         }.let {
             conCurrencyRepository.findByIdOrNull(entity.id)
                 ?.let {
@@ -61,7 +61,7 @@ internal class SuccessRedisLockTest(
             invocations = 1000,
             enabled = true,
         ) {
-            successRedisService.increaseCountWithTryLock(entity.id)
+            redisService.increaseCountWithTryLock(entity.id)
         }.let {
             conCurrencyRepository.findByIdOrNull(entity.id)
                 ?.let {
