@@ -1,5 +1,6 @@
 package com.example.concurrency
 
+import UseCase
 import com.example.concurrency.rdbms.ConCurrencyRepository
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
