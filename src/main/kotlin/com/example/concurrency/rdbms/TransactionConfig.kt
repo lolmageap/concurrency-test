@@ -65,5 +65,7 @@ class RoutingDataSource : AbstractRoutingDataSource() {
         when {
             TransactionSynchronizationManager.isCurrentTransactionReadOnly() -> SLAVE
             else -> MASTER
+        }.also {
+            println("Current lookup key: $it")
         }
 }
