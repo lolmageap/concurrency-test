@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
 class WriteService(private val conCurrencyRepository: ConCurrencyRepository) {
 
-    @Transactional(readOnly = false)
     fun create() =
         conCurrencyRepository.save(
             ConCurrencyEntity(
@@ -20,18 +19,20 @@ class WriteService(private val conCurrencyRepository: ConCurrencyRepository) {
             )
         )
 
-    @Transactional(readOnly = false)
     fun update(id: Long, name: String) =
         conCurrencyRepository.findByIdOrNull(id)?.let {
             it.name = name
         }
 
-    @Transactional(readOnly = false)
     fun updateForce(id: Long, name: String) =
         conCurrencyRepository.updateForce(id, name)
 
+    fun throwException(id: Long, name: String) =
+        conCurrencyRepository.findByIdOrNull(id)?.let {
+            it.name = name
+            throw RuntimeException("Test")
+        }
 
-    @Transactional(readOnly = false)
     fun delete(id: Long) = conCurrencyRepository.deleteById(id)
 
 }
