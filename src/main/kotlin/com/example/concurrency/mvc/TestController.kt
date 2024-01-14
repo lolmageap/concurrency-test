@@ -1,14 +1,15 @@
 package com.example.concurrency.mvc
 
-import UseCase
+
 import org.springframework.web.bind.annotation.*
 
 
 @RestController
 class TestController(
-    private val useCase: UseCase,
     private val readService: ReadService,
     private val writeService: WriteService,
+    private val useCase: UseCase,
+
 ) {
 
     @GetMapping("/test")
@@ -29,6 +30,11 @@ class TestController(
     @PutMapping("/test/{id}")
     fun test(@PathVariable id: Long) {
         useCase.readAndWrite(id, "Update")
+    }
+
+    @PutMapping("/test/{id}/throw")
+    fun throwTest(@PathVariable id: Long) {
+        useCase.transactionTest(id, "throw")
     }
 
     @DeleteMapping("/test/{id}")

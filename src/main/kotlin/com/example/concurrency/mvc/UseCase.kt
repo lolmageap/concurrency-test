@@ -1,5 +1,5 @@
-import com.example.concurrency.mvc.ReadService
-import com.example.concurrency.mvc.WriteService
+package com.example.concurrency.mvc
+
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,7 +16,8 @@ class UseCase(
      * 또한 수정 작업시 동기화 이슈가 발생할 수 있기에 @Modifying 은 권장 되지 않는다.
      *
      * 결론적 으로 수정 작업을 할 때는 writeDB 에서 읽고 쓰기 작업 을 해야 한다.
-     * 그렇지 않으면 readDB와 writeDB 간에 동기화 이슈가 발생할 수 있다.
+     * ChainedTransactionManager 를 사용 하여 readDB 와 writeDB 를 분리 하여 사용 할 수 있지만 스프링 에서는 이 방법을 권장 하지 않는다. (disable 되었음)
+     * readDB와 writeDB 간에 동기화 이슈가 발생할 수 있기 때문 이다.
      * 그래서 일반적 으로 구성을 할 때 readService 와 useCase 는 transactional(readOnly = true)로 설정 하고
      * writeService 는 transactional(propagation = REQUIRES_NEW, readOnly = false)로 설정 하는 것이 좋아 보인다.
      * 이렇게 하면 쓰기 작업 때만 새로운 transaction 이 열려 writeDB의 커넥션 을 최대한 짧게 유지할 수 있다.(부하 감소)
@@ -29,6 +30,14 @@ class UseCase(
     fun readAndWrite(id: Long, name: String) {
         readService.get(id)
         writeService.update(id, name)
+    }
+
+    @Transactional(readOnly = true)
+    fun transactionTest(id: Long, name: String) {
+        readService.get(id)
+        writeService.update(id, "first")
+        writeService.updateForce(id, "second")
+        writeService.throwException(id, "throw")
     }
 
 }
