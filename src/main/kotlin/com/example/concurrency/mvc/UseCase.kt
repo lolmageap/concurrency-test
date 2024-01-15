@@ -20,8 +20,11 @@ class UseCase(
      * readDB와 writeDB 간에 동기화 이슈가 발생할 수 있기 때문 이다.
      * 그래서 일반적 으로 구성을 할 때 readService 와 useCase 는 transactional(readOnly = true)로 설정 하고
      * writeService 는 transactional(propagation = REQUIRES_NEW, readOnly = false)로 설정 하는 것이 좋아 보인다.
+     * 장점 -> DB 커넥션을 짧게 유지할 수 있음
+     * 단점 -> REQUIRES_NEW 로 새로 생성되는 트랜잭션 마다 커넥션 풀을 잡아먹는다. ex) UseCase 내 5개의 쓰기 작업이 있다면 총 6개의 커넥션을 잡아먹음.
+     * 총합 -> 하나의 UseCase 내에서 쓰기 작업이 많은 경우 UseCase의 transaction을 
      * 이렇게 하면 쓰기 작업 때만 새로운 transaction 이 열려 writeDB의 커넥션 을 최대한 짧게 유지할 수 있다.(부하 감소)
-     * 필요(성능)에 따라 @Modifying 을 사용 하여 dirty checking 을 적용 하지 않는 것이 좋다.
+     * 필요(성능)에 따라 @Modifying 을 사용 하여 dirty checking 을 적용 하지 않는 것이 좋다. -> writeDB 에서 조회를 하지 않고 update가 가능.
      * 일반적 으로 update 작업을 할 땐 무거운 조인이 발생 하지 않고 pk를 이용한 조회 후
      * 수정 작업을 하므로 이런 방식도 부하를 최소한 으로 할 수 있을것 이라고 예상 한다.
      * 만약 pk가 아닌 다른 컬럼을 이용한 수정 작업을 한다면 readDB 에서 pk를 조회한 후 작업을 하는 것이 masterDB 의 부하를 최대한 줄여줄 것으로 예상 한다.
