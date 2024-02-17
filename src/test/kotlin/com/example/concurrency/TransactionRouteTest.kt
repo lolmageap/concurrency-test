@@ -14,19 +14,16 @@ class TransactionRouteTest(
     @Autowired private val conCurrencyRepository: ConCurrencyRepository,
 ): StringSpec({
 
-    beforeEach {
-        conCurrencyRepository.saveAndFlush(
+    "read slave and write master" {
+        val entity = conCurrencyRepository.save(
             ConCurrencyEntity(
-                id = 1,
                 name = "Test",
             )
         )
-    }
 
-    "read slave and write master" {
-        useCase.readAndWrite(1, "Updated")
+        useCase.readAndWrite(entity.id, "Updated")
 
-        val result = conCurrencyRepository.findByIdOrNull(1)!!
+        val result = conCurrencyRepository.findByIdOrNull(entity.id)!!
         result.name shouldBe "Updated"
     }
 
