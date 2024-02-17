@@ -1,6 +1,6 @@
 package com.example.concurrency
 
-import UseCase
+import com.example.concurrency.mvc.UseCase
 import com.example.concurrency.rdbms.ConCurrencyRepository
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -29,6 +29,5 @@ class TransactionRouteTest(
         val result = conCurrencyRepository.findByIdOrNull(1)!!
         result.name shouldBe "Updated"
     }
-
 
 })
