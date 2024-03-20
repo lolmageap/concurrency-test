@@ -1,7 +1,7 @@
 package com.example.concurrency
 
 import com.example.concurrency.nosql.RedisService
-import com.example.concurrency.rdbms.ConCurrencyRepository
+import com.example.concurrency.rdbms.ConcurrencyRepository
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.testcontainers.perSpec
 import io.kotest.matchers.shouldBe
@@ -12,7 +12,7 @@ import org.testcontainers.containers.GenericContainer
 
 @SpringBootTest
 internal class RedisLockTest(
-    @Autowired private val conCurrencyRepository: ConCurrencyRepository,
+    @Autowired private val concurrencyRepository: ConcurrencyRepository,
     @Autowired private val redisService: RedisService,
 ) : BehaviorSpec({
 
@@ -29,8 +29,8 @@ internal class RedisLockTest(
     }
 
     Given("동시성 처리를 위해 Redis 에 Spin Lock 을 적용한 뒤") {
-        val entity = conCurrencyRepository.save(
-            ConCurrencyEntity(
+        val entity = concurrencyRepository.save(
+            ConcurrencyEntity(
                 name = "Spin Lock",
             )
         )
@@ -42,7 +42,7 @@ internal class RedisLockTest(
         ) {
             redisService.increaseCountWithSpinLock(entity.id)
         }.let {
-            conCurrencyRepository.findByIdOrNull(entity.id)
+            concurrencyRepository.findByIdOrNull(entity.id)
                 ?.let {
                     it.count shouldBe 1000
                 }
@@ -50,8 +50,8 @@ internal class RedisLockTest(
     }
 
     Given("동시성 처리를 위해 Redis 에 Try Lock 을 적용한 뒤") {
-        val entity = conCurrencyRepository.save(
-            ConCurrencyEntity(
+        val entity = concurrencyRepository.save(
+            ConcurrencyEntity(
                 name = "Try Lock",
             )
         )
@@ -63,7 +63,7 @@ internal class RedisLockTest(
         ) {
             redisService.increaseCountWithTryLock(entity.id)
         }.let {
-            conCurrencyRepository.findByIdOrNull(entity.id)
+            concurrencyRepository.findByIdOrNull(entity.id)
                 ?.let {
                     it.count shouldBe 1000
                 }

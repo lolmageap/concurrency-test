@@ -6,19 +6,19 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class ConCurrencyService(
-    private val conCurrencyRepository: ConCurrencyRepository,
+class ConcurrencyService(
+    private val concurrencyRepository: ConcurrencyRepository,
 ) {
 
     fun increaseCountNoLock(id: Long) {
-        conCurrencyRepository.findByIdOrNull(id)
+        concurrencyRepository.findByIdOrNull(id)
             ?.let {
                 it.count += 1
             }
     }
 
     fun increaseCountWithPessimisticLock(id: Long) {
-        conCurrencyRepository.findWithPessimisticLockById(id)
+        concurrencyRepository.findWithPessimisticLockById(id)
             ?.let {
                 it.count += 1
             }

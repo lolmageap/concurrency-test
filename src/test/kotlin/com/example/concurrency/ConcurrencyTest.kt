@@ -1,8 +1,8 @@
 package com.example.concurrency
 
 import com.example.concurrency.Prefix.*
-import com.example.concurrency.rdbms.ConCurrencyRepository
-import com.example.concurrency.rdbms.ConCurrencyService
+import com.example.concurrency.rdbms.ConcurrencyRepository
+import com.example.concurrency.rdbms.ConcurrencyService
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
@@ -37,28 +37,28 @@ import org.springframework.data.repository.findByIdOrNull
 
 
 @SpringBootTest
-internal class ConCurrencyTest(
-    @Autowired private val concurrencyService: ConCurrencyService,
-    @Autowired private val conCurrencyRepository: ConCurrencyRepository,
+internal class ConcurrencyTest(
+    @Autowired private val concurrencyService: ConcurrencyService,
+    @Autowired private val concurrencyRepository: ConcurrencyRepository,
 ) : BehaviorSpec({
 
     // given 절 clean up
     beforeContainer {
         if (it.prefix === GIVEN) {
-            conCurrencyRepository.deleteAllInBatch()
+            concurrencyRepository.deleteAllInBatch()
         }
     }
 
     // when 절 clean up
     beforeEach {
         if (it.prefix === WHEN) {
-            conCurrencyRepository.deleteAllInBatch()
+            concurrencyRepository.deleteAllInBatch()
         }
     }
 
     Given("동시성 처리를 위해 Lock 을 걸지 않은 뒤") {
-        val entity = conCurrencyRepository.save(
-            ConCurrencyEntity(
+        val entity = concurrencyRepository.save(
+            ConcurrencyEntity(
                 name = "No Lock",
             )
         )
@@ -68,15 +68,15 @@ internal class ConCurrencyTest(
         ) {
             concurrencyService.increaseCountNoLock(entity.id)
         }.let {
-            conCurrencyRepository.findByIdOrNull(entity.id)?.let {
+            concurrencyRepository.findByIdOrNull(entity.id)?.let {
                 it.count shouldBeLessThan 800
             }
         }
     }
 
     Given("동시성 처리를 위해 Pessimistic Lock 적용한 뒤") {
-        val entity = conCurrencyRepository.save(
-            ConCurrencyEntity(
+        val entity = concurrencyRepository.save(
+            ConcurrencyEntity(
                 name = "Pessimistic Lock",
             )
         )
@@ -86,7 +86,7 @@ internal class ConCurrencyTest(
         ) {
             concurrencyService.increaseCountWithPessimisticLock(entity.id)
         }.let {
-            conCurrencyRepository.findByIdOrNull(entity.id)?.let {
+            concurrencyRepository.findByIdOrNull(entity.id)?.let {
                 it.count shouldBe 1000
             }
         }

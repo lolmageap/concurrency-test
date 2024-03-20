@@ -8,7 +8,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "concurrency_entity")
-class ConCurrencyEntity(
+class ConcurrencyEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     var name: String,

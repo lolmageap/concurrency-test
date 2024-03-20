@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 class RedisService(
     private val redisTemplate: StringRedisTemplate,
     private val redissonClient: RedissonClient,
-    private val conCurrencyWithRedisService: ConCurrencyWithRedisService,
+    private val concurrencyWithRedisService: ConcurrencyWithRedisService,
 ) {
 
     /**
@@ -32,7 +32,7 @@ class RedisService(
         }
 
         try {
-            conCurrencyWithRedisService.increaseCount(key)
+            concurrencyWithRedisService.increaseCount(key)
         } finally {
             redisTemplate.delete(redisKey)
         }
@@ -62,7 +62,7 @@ class RedisService(
          */
         try {
             if (lock.tryLock(5, 1, SECONDS)) {
-                conCurrencyWithRedisService.increaseCount(key)
+                concurrencyWithRedisService.increaseCount(key)
             } else {
                 throw RedisLockException("Failed to acquire lock.")
             }

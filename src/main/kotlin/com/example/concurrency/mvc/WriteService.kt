@@ -1,39 +1,43 @@
 package com.example.concurrency.mvc
 
-import com.example.concurrency.ConCurrencyEntity
-import com.example.concurrency.rdbms.ConCurrencyRepository
+import com.example.concurrency.ConcurrencyEntity
+import com.example.concurrency.rdbms.ConcurrencyRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
-class WriteService(private val conCurrencyRepository: ConCurrencyRepository) {
+@Transactional(readOnly = false)
+class WriteService(private val concurrencyRepository: ConcurrencyRepository) {
 
     fun create() =
-        conCurrencyRepository.save(
-            ConCurrencyEntity(
+        concurrencyRepository.save(
+            ConcurrencyEntity(
                 id = 0,
                 name = "Test",
             )
         )
 
-    fun update(id: Long, name: String) =
-        conCurrencyRepository.findByIdOrNull(id)?.let {
+    fun updateName(id: Long, name: String) =
+        concurrencyRepository.findByIdOrNull(id)?.let {
             it.name = name
         }
 
+    fun updateCount(id: Long) =
+        concurrencyRepository.findByIdOrNull(id)?.let {
+            it.count += 1
+        }
+
     fun updateForce(id: Long, name: String) =
-        conCurrencyRepository.updateForce(id, name)
+        concurrencyRepository.updateForce(id, name)
 
     fun throwException(id: Long, name: String) =
-        conCurrencyRepository.findByIdOrNull(id)?.let {
+        concurrencyRepository.findByIdOrNull(id)?.let {
             it.name = name
             throw RuntimeException("Test")
         }
 
-    fun delete(id: Long) = conCurrencyRepository.deleteById(id)
+    fun delete(id: Long) = concurrencyRepository.deleteById(id)
 
 }
 
