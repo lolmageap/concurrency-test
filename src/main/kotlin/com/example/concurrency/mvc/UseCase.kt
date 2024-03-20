@@ -32,15 +32,22 @@ class UseCase(
 
     fun readAndWrite(id: Long, name: String) {
         readService.get(id)
-        writeService.update(id, name)
+        writeService.updateName(id, name)
     }
 
     @Transactional(readOnly = true)
     fun transactionTest(id: Long, name: String) {
         readService.get(id)
-        writeService.update(id, "first")
+        writeService.updateName(id, "first")
         writeService.updateForce(id, "second")
         writeService.throwException(id, "throw")
     }
 
+    @Transactional(readOnly = false)
+    fun transactionTest2(id: Long) {
+        readService.get(id)
+        writeService.updateName(id, "first")
+        writeService.updateCount(id)
+        writeService.updateName(id, "second")
+    }
 }
